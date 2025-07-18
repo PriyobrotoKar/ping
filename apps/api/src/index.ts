@@ -8,7 +8,7 @@ async function bootstrap() {
       process.env.DATABASE_URL || "mongodb://localhost:27017/mydb",
     );
 
-    app.listen(3000, () => {
+    app.listen(port, () => {
       console.log(`Server is running on http://localhost:${port}`);
     });
   } catch (error) {

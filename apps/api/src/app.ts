@@ -1,13 +1,13 @@
 import express from "express";
 import cookieParser from "cookie-parser";
-
-// Erokhom kore User model access korish....
-import { User } from "@ping/db";
+import { protectRoute } from "./middlewares/auth.middleware";
 
 const app = express();
 
 app.use(express.json());
 app.use(cookieParser());
+
+app.use(protectRoute);
 
 app.get("/", (_, res) => {
   res.send("Hello World!");
