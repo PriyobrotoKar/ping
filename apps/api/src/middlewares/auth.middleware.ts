@@ -2,15 +2,20 @@ import jwt from "jsonwebtoken";
 import { User } from "@ping/db";
 import { Handler } from "express";
 import { CurrentUser } from "@/types/auth";
+import { UnauthorizedError } from "@/lib/ApiError";
+
+const publicRoutes = ["/api/health"];
 
 export const protectRoute: Handler = async (req, res, next) => {
   try {
+    if (publicRoutes.includes(req.path)) {
+      return next();
+    }
+
     const token = req.cookies.jwt;
 
     if (!token) {
-      return res
-        .status(401)
-        .json({ message: "Unauthorized - No Token Provided" });
+      throw new UnauthorizedError();
     }
 
     const decoded = jwt.verify(token, process.env.JWT_SECRET!) as
@@ -18,7 +23,7 @@ export const protectRoute: Handler = async (req, res, next) => {
       | undefined;
 
     if (!decoded) {
-      return res.status(401).json({ message: "Unauthorized - Invalid Token" });
+      throw new UnauthorizedError("Invalid token");
     }
 
     const user = await User.findById(decoded.userId).select("-password");
@@ -34,6 +39,9 @@ export const protectRoute: Handler = async (req, res, next) => {
     next();
   } catch (error: any) {
     console.log("Error in protectRoute middleware: ", error.message);
-    res.status(500).json({ message: "Internal server error" });
+    if (error instanceof jwt.JsonWebTokenError) {
+      throw new UnauthorizedError();
+    }
+    throw error;
   }
 };
