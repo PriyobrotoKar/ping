@@ -14,6 +14,7 @@ interface IAuthContext {
   auth: CurrentUser | null;
   setAuth: (user: CurrentUser | null) => void;
   login: (data: { email: string; password: string }) => Promise<void>;
+  logout: () => void;
 }
 
 const AuthContext = createContext<IAuthContext | null>(null);
@@ -50,12 +51,19 @@ function AuthContextProvider({ children }: { children: ReactNode }) {
     }
   };
 
+  const logout = () => {
+    AuthService.logout();
+    setAuth(null);
+    localStorage.removeItem("user");
+  };
+
   return (
     <AuthContext.Provider
       value={{
         auth,
         setAuth,
         login,
+        logout,
       }}
     >
       {children}

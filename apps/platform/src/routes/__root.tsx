@@ -13,7 +13,6 @@ export const Route = createRootRoute({
           <Toaster richColors />
         </AuthContextProvider>
       </ReactQueryProvider>
-      <TanStackRouterDevtools />
     </>
   ),
 });

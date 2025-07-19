@@ -1,3 +1,4 @@
+import ChatSidebar from "@/components/ChatSidebar";
 import { useAuth } from "@/providers/AuthProvider";
 import { createFileRoute, Navigate, Outlet } from "@tanstack/react-router";
 
@@ -8,14 +9,13 @@ export const Route = createFileRoute("/(app)")({
 function RouteComponent() {
   const { auth } = useAuth();
 
-  console.log("DashboardLayout", auth);
-
   if (!auth) {
     return <Navigate to="/login" />;
   }
 
   return (
-    <div>
+    <div className="min-h-svh flex ">
+      <ChatSidebar />
       <Outlet />
     </div>
   );
