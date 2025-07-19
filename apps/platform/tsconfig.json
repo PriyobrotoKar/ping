@@ -1,46 +1,12 @@
 {
-  "compileOnSave": false,
+  "extends": "@ping/typescript-config/react-library.json",
   "compilerOptions": {
-    "strict": true,
-    "noImplicitOverride": true,
-    "noPropertyAccessFromIndexSignature": true,
-    "noImplicitReturns": true,
-    "noFallthroughCasesInSwitch": true,
-    "skipLibCheck": true,
-    "isolatedModules": true,
-    "experimentalDecorators": true,
-    "importHelpers": true,
-    "target": "ES2022",
-    "module": "preserve",
+    "baseUrl": ".",
+    "outDir": "./dist",
     "paths": {
-      "@spartan-ng/helm/form-field": [
-        "./src/libs/ui/ui-form-field-helm/src/index.ts"
-      ],
-      "@spartan-ng/helm/input": [
-        "./src/libs/ui/ui-input-helm/src/index.ts"
-      ],
-      "@spartan-ng/helm/label": [
-        "./src/libs/ui/ui-label-helm/src/index.ts"
-      ],
-      "@spartan-ng/helm/button": [
-        "./src/libs/ui/ui-button-helm/src/index.ts"
-      ]
+      "@/*": ["src/*"]
     }
   },
-  "angularCompilerOptions": {
-    "enableI18nLegacyMessageIdFormat": false,
-    "strictInjectionParameters": true,
-    "strictInputAccessModifiers": true,
-    "typeCheckHostBindings": true,
-    "strictTemplates": true
-  },
-  "files": [],
-  "references": [
-    {
-      "path": "./tsconfig.app.json"
-    },
-    {
-      "path": "./tsconfig.spec.json"
-    }
-  ]
+  "include": ["src/**/*.ts", "src/**/*.tsx"],
+  "exclude": ["node_modules", "dist"]
 }
