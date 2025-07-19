@@ -24,5 +24,12 @@ const userSchema = new mongoose.Schema(
   { timestamps: true },
 );
 
-export type IUser = InferSchemaType<typeof userSchema>;
+userSchema.pre("find", function (next) {
+  this.select("-password");
+  next();
+});
+
+export type IUser = InferSchemaType<typeof userSchema> & {
+  _id: string;
+};
 export const User = mongoose.model("User", userSchema);

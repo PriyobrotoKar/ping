@@ -13,6 +13,10 @@ import { IconCheck, IconPlus } from "@tabler/icons-react";
 import { cn } from "@/lib/utils";
 import { Label } from "./ui/label";
 import { Input } from "./ui/input";
+import SearchBox from "./SearchBox";
+import { IUser } from "@ping/db";
+import { useQuery } from "@tanstack/react-query";
+import UserService from "@/api/services/user";
 
 const CreateGroupDialog = () => {
   const [step, setStep] = useState(0);
@@ -74,6 +78,23 @@ const AddMembers = ({
   members,
   setStep,
 }: AddMembersProps) => {
+  const [searchResults, setSearchResults] = useState<IUser[]>([]);
+
+  const {
+    data: allUsers,
+    isLoading,
+    isError,
+  } = useQuery({
+    queryKey: ["users"],
+    queryFn: async () => UserService.getAllUsers(),
+  });
+
+  if (isError || !allUsers) {
+    return <div>Error loading members</div>;
+  }
+
+  const data = searchResults.length > 0 ? searchResults : allUsers;
+
   return (
     <>
       <DialogHeader>
@@ -84,8 +105,10 @@ const AddMembers = ({
         </DialogDescription>
       </DialogHeader>
 
+      <SearchBox setValue={setSearchResults} />
+
       <div>
-        {allMembers.map((member, index) => {
+        {data.map((user, index) => {
           return (
             <div
               className="flex gap-2 items-center justify-between p-2"
@@ -94,25 +117,25 @@ const AddMembers = ({
               <div className="flex gap-2 items-center">
                 <Avatar className="size-10 border">
                   <AvatarImage>
-                    <img src={undefined} alt={member} />
+                    <img src={undefined} alt={user.fullName} />
                   </AvatarImage>
-                  <AvatarFallback>{member.charAt(0)}</AvatarFallback>
+                  <AvatarFallback>{user.fullName.charAt(0)}</AvatarFallback>
                 </Avatar>
-                <div className="font-medium">{member}</div>
+                <div className="font-medium">{user.fullName}</div>
               </div>
               <Button
                 onClick={() => {
-                  if (members.includes(member)) {
-                    setMembers(members.filter((m) => m !== member));
+                  if (members.includes(user._id)) {
+                    setMembers(members.filter((m) => m !== user._id));
                   } else {
-                    setMembers([...members, member]);
+                    setMembers([...members, user._id]);
                   }
                 }}
                 variant={"outline"}
-                className={cn(members.includes(member) && "bg-accent")}
+                className={cn(members.includes(user._id) && "bg-accent")}
                 size={"icon"}
               >
-                {members.includes(member) ? <IconCheck /> : <IconPlus />}
+                {members.includes(user._id) ? <IconCheck /> : <IconPlus />}
               </Button>
             </div>
           );

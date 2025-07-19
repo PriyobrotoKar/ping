@@ -1,23 +1,18 @@
-import { IconSearch } from "@tabler/icons-react";
-import { Input } from "./ui/input";
-import { Button } from "./ui/button";
 import ProfileMenu from "./ProfileMenu";
 import Conversations from "./Conversations";
 import CreateGroupDialog from "./CreateGroupDialog";
+import SearchBox from "./SearchBox";
+import { useState } from "react";
+import { IUser } from "@ping/db";
 
 const ChatSidebar = () => {
+  const [searchResults, setSearchResults] = useState<IUser[]>([]);
+
   return (
     <div className="w-80 flex gap-4 flex-col border-r">
       <div className="px-5 pt-4 space-y-3">
-        <img src="logo-large.png" alt="Logo" />
-        <div className="flex px-3 text-muted-foreground rounded-lg border items-center">
-          <IconSearch />
-          <Input
-            placeholder="Search..."
-            className="bg-transparent focus-visible:ring-0 border-0 shadow-none"
-            type="text"
-          />
-        </div>
+        <img width={100} height={40} src="logo-large.png" alt="Logo" />
+        <SearchBox setValue={setSearchResults} />
       </div>
 
       <hr />
@@ -30,7 +25,7 @@ const ChatSidebar = () => {
       </div>
 
       <div className="flex-1 py-2">
-        <Conversations />
+        <Conversations searchResults={searchResults} />
       </div>
 
       <div className="px-2 py-4">

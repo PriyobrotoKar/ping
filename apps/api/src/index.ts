@@ -1,14 +1,18 @@
 import app from "./app";
 import { connectToDb } from "@ping/db";
+import { createServer } from "node:http";
+
 const port = process.env.PORT || 3000;
 
 async function bootstrap() {
   try {
+    const server = createServer(app);
+
     await connectToDb(
       process.env.DATABASE_URL || "mongodb://localhost:27017/mydb",
     );
 
-    app.listen(port, () => {
+    server.listen(port, () => {
       console.log(`Server is running on http://localhost:${port}`);
     });
   } catch (error) {
