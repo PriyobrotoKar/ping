@@ -21,7 +21,7 @@ function getCookie(cName: string, socket: Socket) {
 function createWebSocketServer(server: ReturnType<typeof createServer>) {
   const ws = new Server(server, {
     cors: {
-      origin: "http://localhost:3000",
+      origin: process.env.FRONTEND_URL || "http://localhost:3000",
       credentials: true,
     },
   });
