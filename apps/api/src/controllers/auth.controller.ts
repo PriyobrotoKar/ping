@@ -85,7 +85,11 @@ export const login: Handler = async (req, res) => {
 };
 
 export const logout: Handler = (_, res) => {
-  res.cookie("jwt", "", { maxAge: 0 });
+  res.clearCookie("jwt", {
+    httpOnly: true,
+    secure: process.env.NODE_ENV === "production",
+    sameSite: "none",
+  });
   res.status(200).json({ message: "Logged out successfully" });
 };
 
