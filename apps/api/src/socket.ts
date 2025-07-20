@@ -10,7 +10,7 @@ function getCookie(cName: string, socket: Socket) {
     return null;
   }
   const cDecoded = decodeURIComponent(socket.handshake.headers.cookie);
-  const cArr = cDecoded.split(";");
+  const cArr = cDecoded.split(";").map((c) => c.trim());
   let res;
   cArr.forEach((val) => {
     if (val.indexOf(name) === 0) res = val.substring(name.length);
