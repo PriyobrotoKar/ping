@@ -4,7 +4,7 @@ import { Handler } from "express";
 import { CurrentUser } from "@/types/auth";
 import { UnauthorizedError } from "@/lib/ApiError";
 
-const publicRoutes = ["/auth/signup", "/auth/login"];
+const publicRoutes = ["/auth/signup", "/auth/login", "/health"];
 
 export const protectRoute: Handler = async (req, res, next) => {
   console.log("Protecting route: ", req.path);

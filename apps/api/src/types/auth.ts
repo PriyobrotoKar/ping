@@ -1,5 +1,5 @@
-import { ObjectId } from "@ping/db";
+import { ObjectId, Types } from "@ping/db";
 
 export type CurrentUser = {
-  _id: ObjectId;
+  _id: Types.ObjectId;
 };
