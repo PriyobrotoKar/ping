@@ -24,8 +24,6 @@ const ChatScreen = ({ chatId }: ChatScreenProps) => {
 
   const { auth } = useAuth();
 
-  console.log(auth);
-
   const scrollToBottom = () => {
     if (!chatContainerRef.current) return;
     chatContainerRef.current.scrollTop = chatContainerRef.current.scrollHeight;
@@ -46,12 +44,15 @@ const ChatScreen = ({ chatId }: ChatScreenProps) => {
           id = chatExists._id.toString();
           console.log("chat exists", chatExists);
           participants = chatExists.participants.map((p) => p._id.toString());
+        } else {
+          const chat = await ChatService.getChat(chatId);
+          participants = chat.participants.map((p) => p._id.toString());
         }
 
-        console.log("Chat ID:", id, auth);
+        console.log("settigns participants:", participants);
+
         participants = participants.filter((p) => p !== auth?._id.toString());
         const messages = await ChatService.getMessages(id);
-        console.log("Messages for chat:", id, messages);
         setParticipants(participants);
         setChatIdState(id);
         return messages;
@@ -71,7 +72,7 @@ const ChatScreen = ({ chatId }: ChatScreenProps) => {
   const handleSendMessage = (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault();
 
-    console.log("Sending message:", message, chatIdState);
+    console.log(participants, chatIdState);
 
     socket.emit("send_message", {
       chatId: chatIdState,
@@ -112,7 +113,6 @@ const ChatScreen = ({ chatId }: ChatScreenProps) => {
   };
 
   const setMessagesAsRead = async (messages: IMessage[]) => {
-    console.log("Setting messages as read for chat:", chatIdState, messages);
     if (!chatIdState || messages.length === 0) return;
 
     const messageIds = messages
@@ -122,22 +122,24 @@ const ChatScreen = ({ chatId }: ChatScreenProps) => {
     if (messageIds.length === 0) return;
 
     try {
-      console.log("Marking messages as read:", messageIds);
       await ChatService.markAsRead(messageIds);
       queryClient.invalidateQueries({
         queryKey: ["chats"],
       });
-      queryClient.setQueryData(
-        ["messages", chatIdState],
-        (oldMessages: IMessage[]) => {
-          if (!oldMessages) return oldMessages;
-
-          return oldMessages.map((msg) => ({
-            ...msg,
-            readBy: [...(msg.readBy || []), auth?._id],
-          }));
-        },
-      );
+      // queryClient.invalidateQueries({
+      //   queryKey: ["messages", chatIdState],
+      // });
+      // queryClient.setQueryData(
+      //   ["messages", chatIdState],
+      //   (oldMessages: IMessage[]) => {
+      //     if (!oldMessages) return oldMessages;
+      //
+      //     return oldMessages.map((msg) => ({
+      //       ...msg,
+      //       readBy: [...(msg.readBy || []), auth?._id],
+      //     }));
+      //   },
+      // );
     } catch (error) {
       console.error("Error marking messages as read:", error);
     }

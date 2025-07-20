@@ -21,7 +21,7 @@ const GroupChatHeader = ({ groupId }: GroupChatHeaderProps) => {
   }
 
   return (
-    <header className="flex fixed gap-4 px-4 py-3 border-b w-full items-center">
+    <header className="flex bg-background fixed gap-4 px-4 py-3 border-b w-full items-center">
       <div>
         <Avatar className="size-10 overflow-visible relative border">
           <AvatarImage>

@@ -1,7 +1,7 @@
 import { cn } from "@/lib/utils";
 import { Avatar, AvatarFallback, AvatarImage } from "./ui/avatar";
 import { IChat, IMessage, IUser } from "@ping/db";
-import { Link } from "@tanstack/react-router";
+import { Link, useParams } from "@tanstack/react-router";
 import { useAuth } from "@/providers/AuthProvider";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import ChatService from "@/api/services/chat";
@@ -13,24 +13,28 @@ interface ConversationProps {
 }
 
 const Conversations = ({ searchResults }: ConversationProps) => {
+  const params = useParams({
+    strict: false,
+  });
+
+  const chatId = params.chatId;
+
   const { auth } = useAuth();
   const { data, isLoading, isError, refetch } = useQuery({
     queryKey: ["chats"],
     queryFn: async () => await ChatService.getAllChats(),
   });
 
-  const queryClient = useQueryClient();
-
   const handleNewMessage = (message: IMessage) => {
     console.log("New message received:", message);
     refetch();
   };
 
-  const handleUserOnline = (user: IUser) => {
+  const handleUserOnline = () => {
     refetch();
   };
 
-  const handleUserOffline = (user: IUser) => {
+  const handleUserOffline = () => {
     refetch();
   };
 
@@ -64,6 +68,12 @@ const Conversations = ({ searchResults }: ConversationProps) => {
 
         if (!sender) return null;
 
+        const isActive =
+          chatId ===
+          (chat.isGroupChat
+            ? chat._id.toString()
+            : `${auth?._id}-${sender._id.toString()}`);
+
         return (
           <Link
             to={chat.isGroupChat ? `/public/$chatId` : `/private/$chatId`}
@@ -75,7 +85,10 @@ const Conversations = ({ searchResults }: ConversationProps) => {
           >
             <div
               key={chat._id.toString()}
-              className={"p-4 relative hover:bg-accent cursor-pointer"}
+              className={cn(
+                "p-4 relative hover:bg-accent cursor-pointer",
+                isActive && "bg-accent",
+              )}
             >
               {chat.unreadCount > 0 && (
                 <span
