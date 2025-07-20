@@ -1,3 +1,12 @@
+export class ClientError extends Error {
+  status: number;
+
+  constructor(message: string, status: number) {
+    super(message);
+    this.status = status;
+  }
+}
+
 class ApiClient {
   private baseUrl: string = import.meta.env.VITE_BACKEND_URL + "/api";
 
@@ -26,7 +35,7 @@ class ApiClient {
 
       if (!response.ok) {
         const errorData = await response.json();
-        throw new Error(errorData.message);
+        throw new ClientError(errorData.message, response.status);
       }
 
       return await response.json();

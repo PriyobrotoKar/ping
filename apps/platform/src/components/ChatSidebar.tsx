@@ -4,6 +4,7 @@ import CreateGroupDialog from "./CreateGroupDialog";
 import SearchBox from "./SearchBox";
 import { useState } from "react";
 import { IUser } from "@ping/db";
+import Logo from "./Logo";
 
 const ChatSidebar = () => {
   const [searchResults, setSearchResults] = useState<IUser[]>([]);
@@ -11,7 +12,7 @@ const ChatSidebar = () => {
   return (
     <div className="w-80 flex gap-4 flex-col border-r">
       <div className="px-5 pt-4 space-y-3">
-        <img width={100} height={40} src="logo-large.png" alt="Logo" />
+        <Logo type="full" />
         <SearchBox setValue={setSearchResults} />
       </div>
 

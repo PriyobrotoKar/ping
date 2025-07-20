@@ -9,43 +9,80 @@ import {
 } from "./ui/dialog";
 import { Avatar, AvatarFallback, AvatarImage } from "./ui/avatar";
 import { Button } from "./ui/button";
-import { IconCheck, IconPlus } from "@tabler/icons-react";
-import { cn } from "@/lib/utils";
+import { IconCheck, IconLoader, IconPlus } from "@tabler/icons-react";
+import { cn, sleep } from "@/lib/utils";
 import { Label } from "./ui/label";
 import { Input } from "./ui/input";
 import SearchBox from "./SearchBox";
 import { IUser } from "@ping/db";
-import { useQuery } from "@tanstack/react-query";
+import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import UserService from "@/api/services/user";
+import { useAuth } from "@/providers/AuthProvider";
+import ChatService from "@/api/services/chat";
+import { toast } from "sonner";
+import { useNavigate } from "@tanstack/react-router";
 
 const CreateGroupDialog = () => {
+  const [open, setOpen] = useState(false);
   const [step, setStep] = useState(0);
   const [members, setMembers] = useState<string[]>([]);
   const [groupName, setGroupName] = useState("");
 
-  const allMembers = [
-    "John Doe",
-    "Jane Smith",
-    "Alice Johnson",
-    "Bob Brown",
-    "Charlie Davis",
-  ];
+  const queryClient = useQueryClient();
+  const navigate = useNavigate();
+  const { auth } = useAuth();
+
+  const mutation = useMutation({
+    mutationFn: async () =>
+      ChatService.createChat({
+        userIds: [...members, auth?._id.toString()!],
+        groupName,
+      }),
+    onError: (error) => {
+      console.error("Error creating group:", error);
+      toast.error("Failed to create group. Please try again.");
+    },
+    onSuccess: (data) => {
+      queryClient.invalidateQueries({
+        queryKey: ["chats"],
+      });
+      navigate({
+        to: `/public/${data._id.toString()}`,
+      });
+      cleanUp();
+    },
+  });
 
   const handleGroupCreate = async () => {
+    if (!groupName.trim()) {
+      return;
+    }
     console.log("Creating group with members:", members);
     console.log("Group name:", groupName);
+
+    mutation.mutate();
+  };
+
+  const cleanUp = async () => {
+    setOpen(false);
+    setMembers([]);
+    setGroupName("");
+    await sleep(100);
+    setStep(0);
   };
 
   return (
-    <Dialog>
+    <Dialog
+      open={open}
+      onOpenChange={(open) => (!open ? cleanUp() : setOpen(true))}
+    >
       <DialogTrigger asChild>
         <Button className="w-full">Create New Group</Button>
       </DialogTrigger>
 
-      <DialogContent className="gap-6 flex flex-col sm:max-w-[24rem]">
+      <DialogContent className="gap-6 max-h-[32rem] flex flex-col sm:max-w-[24rem]">
         {step === 0 ? (
           <AddMembers
-            allMembers={allMembers}
             members={members}
             setMembers={setMembers}
             setStep={setStep}
@@ -66,18 +103,13 @@ const CreateGroupDialog = () => {
 export default CreateGroupDialog;
 
 interface AddMembersProps {
-  allMembers: string[];
   members: string[];
   setMembers: (members: string[]) => void;
   setStep: (step: number) => void;
 }
 
-const AddMembers = ({
-  allMembers,
-  setMembers,
-  members,
-  setStep,
-}: AddMembersProps) => {
+const AddMembers = ({ setMembers, members, setStep }: AddMembersProps) => {
+  const { auth } = useAuth();
   const [searchResults, setSearchResults] = useState<IUser[]>([]);
 
   const {
@@ -88,6 +120,14 @@ const AddMembers = ({
     queryKey: ["users"],
     queryFn: async () => UserService.getAllUsers(),
   });
+
+  if (isLoading) {
+    return (
+      <div className="flex min-h-[32rem] justify-center items-center flex-1">
+        <IconLoader className="animate-spin" />
+      </div>
+    );
+  }
 
   if (isError || !allUsers) {
     return <div>Error loading members</div>;
@@ -107,8 +147,9 @@ const AddMembers = ({
 
       <SearchBox setValue={setSearchResults} />
 
-      <div>
+      <div className="overflow-y-auto">
         {data.map((user, index) => {
+          if (user._id === auth?._id) return;
           return (
             <div
               className="flex gap-2 items-center justify-between p-2"
@@ -125,24 +166,36 @@ const AddMembers = ({
               </div>
               <Button
                 onClick={() => {
-                  if (members.includes(user._id)) {
-                    setMembers(members.filter((m) => m !== user._id));
+                  if (members.includes(user._id.toString())) {
+                    setMembers(
+                      members.filter((m) => m !== user._id.toString()),
+                    );
                   } else {
-                    setMembers([...members, user._id]);
+                    setMembers([...members, user._id.toString()]);
                   }
                 }}
                 variant={"outline"}
-                className={cn(members.includes(user._id) && "bg-accent")}
+                className={cn(
+                  members.includes(user._id.toString()) && "bg-accent",
+                )}
                 size={"icon"}
               >
-                {members.includes(user._id) ? <IconCheck /> : <IconPlus />}
+                {members.includes(user._id.toString()) ? (
+                  <IconCheck />
+                ) : (
+                  <IconPlus />
+                )}
               </Button>
             </div>
           );
         })}
       </div>
 
-      <Button onClick={() => setStep(1)} className="w-full">
+      <Button
+        disabled={members.length === 0}
+        onClick={() => setStep(1)}
+        className="w-full"
+      >
         {members.length > 0 && (
           <span className="bg-secondary text-secondary-foreground size-4 rounded-full text-xs flex justify-center items-center">
             {members.length}

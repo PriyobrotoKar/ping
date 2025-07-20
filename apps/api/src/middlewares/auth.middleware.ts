@@ -34,7 +34,7 @@ export const protectRoute: Handler = async (req, res, next) => {
     }
 
     req.user = {
-      _id: user._id.toString(),
+      _id: user._id,
     };
 
     next();

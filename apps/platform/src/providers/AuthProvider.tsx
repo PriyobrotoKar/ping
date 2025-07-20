@@ -7,8 +7,9 @@ import {
 } from "react";
 import { IUser } from "@ping/db";
 import AuthService from "@/api/services/auth";
+import { socket } from "@/lib/socket";
 
-export type CurrentUser = Pick<IUser, "fullName" | "email">;
+export type CurrentUser = Pick<IUser, "_id" | "fullName" | "email">;
 
 interface IAuthContext {
   auth: CurrentUser | null;
@@ -28,9 +29,11 @@ function AuthContextProvider({ children }: { children: ReactNode }) {
   useEffect(() => {
     const fetchUser = async () => {
       try {
-        const { fullName, email } = await AuthService.checkAuth();
-        setAuth({ fullName, email });
-        localStorage.setItem("user", JSON.stringify({ fullName, email }));
+        const { fullName, email, _id } = await AuthService.checkAuth();
+        setAuth({ fullName, email, _id });
+        localStorage.setItem("user", JSON.stringify({ fullName, email, _id }));
+        socket.connect();
+        socket.emit("join_global", _id);
       } catch (error) {
         setAuth(null);
         localStorage.removeItem("user");
@@ -38,13 +41,19 @@ function AuthContextProvider({ children }: { children: ReactNode }) {
     };
 
     fetchUser();
+
+    return () => {
+      socket.disconnect();
+    };
   }, []);
 
   const login = async (data: { email: string; password: string }) => {
     try {
-      const { fullName, email } = await AuthService.login(data);
-      setAuth({ fullName, email });
-      localStorage.setItem("user", JSON.stringify({ fullName, email }));
+      const { fullName, email, _id } = await AuthService.login(data);
+      setAuth({ fullName, email, _id });
+      localStorage.setItem("user", JSON.stringify({ fullName, email, _id }));
+      socket.connect();
+      socket.emit("join_global", _id);
     } catch (error) {
       console.error("Login error:", error);
       throw error;
@@ -55,6 +64,7 @@ function AuthContextProvider({ children }: { children: ReactNode }) {
     AuthService.logout();
     setAuth(null);
     localStorage.removeItem("user");
+    socket.disconnect();
   };
 
   return (

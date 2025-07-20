@@ -14,6 +14,8 @@ import { Route as appRouteRouteImport } from './routes/(app)/route'
 import { Route as appIndexRouteImport } from './routes/(app)/index'
 import { Route as authRegisterRouteImport } from './routes/(auth)/register'
 import { Route as authLoginRouteImport } from './routes/(auth)/login'
+import { Route as appPublicChatIdIndexRouteImport } from './routes/(app)/public/$chatId/index'
+import { Route as appPrivateChatIdIndexRouteImport } from './routes/(app)/private/$chatId/index'
 
 const authRouteRoute = authRouteRouteImport.update({
   id: '/(auth)',
@@ -38,16 +40,30 @@ const authLoginRoute = authLoginRouteImport.update({
   path: '/login',
   getParentRoute: () => authRouteRoute,
 } as any)
+const appPublicChatIdIndexRoute = appPublicChatIdIndexRouteImport.update({
+  id: '/public/$chatId/',
+  path: '/public/$chatId/',
+  getParentRoute: () => appRouteRoute,
+} as any)
+const appPrivateChatIdIndexRoute = appPrivateChatIdIndexRouteImport.update({
+  id: '/private/$chatId/',
+  path: '/private/$chatId/',
+  getParentRoute: () => appRouteRoute,
+} as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof appIndexRoute
   '/login': typeof authLoginRoute
   '/register': typeof authRegisterRoute
+  '/private/$chatId': typeof appPrivateChatIdIndexRoute
+  '/public/$chatId': typeof appPublicChatIdIndexRoute
 }
 export interface FileRoutesByTo {
   '/': typeof appIndexRoute
   '/login': typeof authLoginRoute
   '/register': typeof authRegisterRoute
+  '/private/$chatId': typeof appPrivateChatIdIndexRoute
+  '/public/$chatId': typeof appPublicChatIdIndexRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
@@ -56,12 +72,19 @@ export interface FileRoutesById {
   '/(auth)/login': typeof authLoginRoute
   '/(auth)/register': typeof authRegisterRoute
   '/(app)/': typeof appIndexRoute
+  '/(app)/private/$chatId/': typeof appPrivateChatIdIndexRoute
+  '/(app)/public/$chatId/': typeof appPublicChatIdIndexRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
-  fullPaths: '/' | '/login' | '/register'
+  fullPaths:
+    | '/'
+    | '/login'
+    | '/register'
+    | '/private/$chatId'
+    | '/public/$chatId'
   fileRoutesByTo: FileRoutesByTo
-  to: '/' | '/login' | '/register'
+  to: '/' | '/login' | '/register' | '/private/$chatId' | '/public/$chatId'
   id:
     | '__root__'
     | '/(app)'
@@ -69,6 +92,8 @@ export interface FileRouteTypes {
     | '/(auth)/login'
     | '/(auth)/register'
     | '/(app)/'
+    | '/(app)/private/$chatId/'
+    | '/(app)/public/$chatId/'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
@@ -113,15 +138,33 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof authLoginRouteImport
       parentRoute: typeof authRouteRoute
     }
+    '/(app)/public/$chatId/': {
+      id: '/(app)/public/$chatId/'
+      path: '/public/$chatId'
+      fullPath: '/public/$chatId'
+      preLoaderRoute: typeof appPublicChatIdIndexRouteImport
+      parentRoute: typeof appRouteRoute
+    }
+    '/(app)/private/$chatId/': {
+      id: '/(app)/private/$chatId/'
+      path: '/private/$chatId'
+      fullPath: '/private/$chatId'
+      preLoaderRoute: typeof appPrivateChatIdIndexRouteImport
+      parentRoute: typeof appRouteRoute
+    }
   }
 }
 
 interface appRouteRouteChildren {
   appIndexRoute: typeof appIndexRoute
+  appPrivateChatIdIndexRoute: typeof appPrivateChatIdIndexRoute
+  appPublicChatIdIndexRoute: typeof appPublicChatIdIndexRoute
 }
 
 const appRouteRouteChildren: appRouteRouteChildren = {
   appIndexRoute: appIndexRoute,
+  appPrivateChatIdIndexRoute: appPrivateChatIdIndexRoute,
+  appPublicChatIdIndexRoute: appPublicChatIdIndexRoute,
 }
 
 const appRouteRouteWithChildren = appRouteRoute._addFileChildren(

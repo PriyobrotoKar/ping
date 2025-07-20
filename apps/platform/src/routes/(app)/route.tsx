@@ -14,7 +14,7 @@ function RouteComponent() {
   }
 
   return (
-    <div className="min-h-svh flex ">
+    <div className="h-svh flex ">
       <ChatSidebar />
       <Outlet />
     </div>

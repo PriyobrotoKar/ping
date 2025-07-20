@@ -10,11 +10,21 @@ import {
 } from "@/components/ui/dropdown-menu";
 import { Button } from "./ui/button";
 import { Avatar, AvatarFallback, AvatarImage } from "./ui/avatar";
-import { IconDotsVertical, IconLogout2 } from "@tabler/icons-react";
+import {
+  IconDeviceHeartMonitor,
+  IconDotsVertical,
+  IconLogout2,
+  IconMoon,
+  IconSun,
+} from "@tabler/icons-react";
 import { useAuth } from "@/providers/AuthProvider";
+import { ToggleGroup, ToggleGroupItem } from "./ui/toggle-group";
+import { useTheme } from "@/providers/ThemeProvider";
 
 const ProfileMenu = () => {
   const { auth, logout } = useAuth();
+  const { theme, setTheme } = useTheme();
+
   return (
     <DropdownMenu>
       <DropdownMenuTrigger asChild>
@@ -67,9 +77,34 @@ const ProfileMenu = () => {
           </div>
         </DropdownMenuLabel>
         <DropdownMenuSeparator />
-        <DropdownMenuItem variant="destructive" onClick={logout}>
-          <IconLogout2 />
+        <DropdownMenuItem className="focus:bg-transparent">
+          Theme
+          <ToggleGroup
+            type="single"
+            value={theme}
+            size={"sm"}
+            variant={"outline"}
+            className="rounded-full"
+            onClick={(e) => e.stopPropagation()}
+            onValueChange={(value: "system" | "dark" | "light") => {
+              if (!value) return;
+              setTheme(value);
+            }}
+          >
+            <ToggleGroupItem variant={"outline"} value="system">
+              <IconDeviceHeartMonitor />
+            </ToggleGroupItem>
+            <ToggleGroupItem value="light">
+              <IconSun />
+            </ToggleGroupItem>
+            <ToggleGroupItem value="dark">
+              <IconMoon />
+            </ToggleGroupItem>
+          </ToggleGroup>
+        </DropdownMenuItem>
+        <DropdownMenuItem onClick={logout}>
           Log out
+          <IconLogout2 />
         </DropdownMenuItem>
       </DropdownMenuContent>
     </DropdownMenu>

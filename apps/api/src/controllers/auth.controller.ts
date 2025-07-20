@@ -53,7 +53,6 @@ export const signup: Handler = async (req, res) => {
 };
 
 export const login: Handler = async (req, res) => {
-  console.log("Login request body:", req.body);
   const { email, password } = req.body;
 
   const user = await User.findOne({ email });
@@ -81,6 +80,7 @@ export const login: Handler = async (req, res) => {
     fullName: user.fullName,
     email: user.email,
     profilePic: user.profilePic,
+    token,
   });
 };
 

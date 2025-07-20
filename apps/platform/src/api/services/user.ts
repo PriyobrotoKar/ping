@@ -13,6 +13,10 @@ class UserService {
   static async getAllUsers() {
     return this.apiClient.get<IUser[]>("/");
   }
+
+  static async getUserById(userId: string) {
+    return this.apiClient.get<IUser>(`/${userId}`);
+  }
 }
 
 export default UserService;

@@ -16,6 +16,7 @@ import { useMutation } from "@tanstack/react-query";
 import AuthService from "@/api/services/auth";
 import { toast } from "sonner";
 import { useAuth } from "@/providers/AuthProvider";
+import Logo from "@/components/Logo";
 
 export const Route = createFileRoute("/(auth)/register")({
   component: RouteComponent,
@@ -69,7 +70,7 @@ function RouteComponent() {
     <div className="min-h-svh flex justify-center items-center">
       <main className="border p-9 space-y-6 max-w-[26rem] w-full rounded-xl">
         <header className="space-y-2">
-          <img src="logo-small.png" alt="Logo Small" />
+          <Logo type="icon" width={40} height={40} />
           <h1 className="text-xl font-medium">Welcome to Ping</h1>
           <p className="text-muted-foreground">
             Next-get Realtime Chat App for you

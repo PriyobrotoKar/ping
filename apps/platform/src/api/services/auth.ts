@@ -5,7 +5,7 @@ class AuthService {
   private static apiClient: ApiClient = new ApiClient("/auth");
 
   static async login(data: { email: string; password: string }) {
-    return this.apiClient.post<IUser>("/login", data);
+    return this.apiClient.post<IUser & { token: string }>("/login", data);
   }
 
   static async register(data: {
