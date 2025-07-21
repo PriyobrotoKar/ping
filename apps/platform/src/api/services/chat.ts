@@ -1,4 +1,4 @@
-import { IChat, IMessage } from "@ping/db";
+import { IChat, IMessage, IUser } from "@ping/db";
 import ApiClient from "../client";
 
 class ChatService {
@@ -9,14 +9,15 @@ class ChatService {
   }
 
   static async isChatExists(userIds: string[]) {
-    return this.apiClient.get<IChat>("/exists", {
+    return this.apiClient.get<IChat & { participants: IUser[] }>("/exists", {
       userIds: userIds.join(","),
     });
   }
 
   static async getMessages(chatId: string) {
-    console.log("Fetching messages for chat:", chatId);
-    return this.apiClient.get<IMessage[]>(`/${chatId}/messages`);
+    return this.apiClient.get<(IMessage & { sender: IUser })[]>(
+      `/${chatId}/messages`,
+    );
   }
 
   static async getAllChats() {
@@ -24,7 +25,7 @@ class ChatService {
   }
 
   static async getChat(chatId: string) {
-    return this.apiClient.get<IChat>(`/${chatId}`);
+    return this.apiClient.get<IChat & { participants: IUser[] }>(`/${chatId}`);
   }
 
   static async markAsRead(messageIds: string[]) {

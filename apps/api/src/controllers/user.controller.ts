@@ -1,8 +1,8 @@
-import { User } from "@ping/db";
+import { Chat, User } from "@ping/db";
 import { Handler } from "express";
 
 export const searchUser: Handler = async (req, res) => {
-  const { query } = req.query;
+  const { query, type } = req.query;
 
   if (!query || typeof query !== "string") {
     return res.status(200).json([]);
@@ -14,7 +14,27 @@ export const searchUser: Handler = async (req, res) => {
     .sort({ createdAt: -1 })
     .ne("_id", req.user?._id);
 
-  return res.status(200).json(users);
+  const chats = await Chat.find({
+    groupName: { $regex: query, $options: "i" },
+  })
+    .populate("lastMessage")
+    .sort({ createdAt: -1 });
+
+  let data: any[] = [];
+
+  if (type === "users") {
+    data = users;
+  } else if (type === "chats") {
+    data = chats;
+  } else if (type === "all") {
+    data = [...users, ...chats];
+  }
+
+  const results = data.sort((a, b) => {
+    return new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime();
+  });
+
+  return res.status(200).json(results);
 };
 
 export const getAllUsers: Handler = async (_, res) => {

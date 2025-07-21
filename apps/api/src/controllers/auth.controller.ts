@@ -93,25 +93,6 @@ export const logout: Handler = (_, res) => {
   res.status(200).json({ message: "Logged out successfully" });
 };
 
-export const updateProfile: Handler = async (req, res) => {
-  const { profilePic } = req.body;
-  const userId = req.user._id;
-
-  if (!profilePic) {
-    throw new BadRequestError("Profile picture is required");
-  }
-
-  // const uploadResponse = await cloudinary.uploader.upload(profilePic);
-  // const updatedUser = await User.findByIdAndUpdate(
-  //   userId,
-  //   { profilePic: uploadResponse.secure_url },
-  //   { new: true },
-  // );
-
-  // res.status(200).json(updatedUser);
-  res.status(200).json({ message: "Not implemented Yet" });
-};
-
 export const checkAuth: Handler = async (req, res) => {
   const user = await User.findOne({ _id: req.user._id });
 

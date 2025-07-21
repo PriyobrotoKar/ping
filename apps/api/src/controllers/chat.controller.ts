@@ -49,11 +49,17 @@ export const createChat: Handler = async (req, res) => {
 
 export const isChatExists: Handler = async (req, res) => {
   const { userIds: ids } = req.query;
+  const userId = req.user._id;
 
   const userIds = (ids as string).split(",").map((id) => id.trim());
 
   if (!userIds || !Array.isArray(userIds) || userIds.length === 0) {
     throw new BadRequestError("Invalid user IDs");
+  }
+
+  // if the current user is not in the userIds, then throw bad request error
+  if (!userIds.includes(userId.toString())) {
+    throw new BadRequestError("Chat not found");
   }
 
   // Check if a chat exists with the provided user IDs

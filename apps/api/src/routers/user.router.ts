@@ -2,7 +2,9 @@ import {
   getAllUsers,
   getUserById,
   searchUser,
+  updateProfile,
 } from "@/controllers/user.controller";
+import { upload } from "@/lib/storage";
 import { Router } from "express";
 
 const userRouter: Router = Router();

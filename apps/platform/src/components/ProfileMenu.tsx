@@ -77,6 +77,7 @@ const ProfileMenu = () => {
           </div>
         </DropdownMenuLabel>
         <DropdownMenuSeparator />
+
         <DropdownMenuItem className="focus:bg-transparent">
           Theme
           <ToggleGroup

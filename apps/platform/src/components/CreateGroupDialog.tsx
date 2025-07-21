@@ -14,7 +14,7 @@ import { cn, sleep } from "@/lib/utils";
 import { Label } from "./ui/label";
 import { Input } from "./ui/input";
 import SearchBox from "./SearchBox";
-import { IUser } from "@ping/db";
+import { IChat, IUser } from "@ping/db";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import UserService from "@/api/services/user";
 import { useAuth } from "@/providers/AuthProvider";
@@ -110,7 +110,7 @@ interface AddMembersProps {
 
 const AddMembers = ({ setMembers, members, setStep }: AddMembersProps) => {
   const { auth } = useAuth();
-  const [searchResults, setSearchResults] = useState<IUser[]>([]);
+  const [searchResults, setSearchResults] = useState<any[]>([]);
 
   const {
     data: allUsers,
@@ -145,7 +145,7 @@ const AddMembers = ({ setMembers, members, setStep }: AddMembersProps) => {
         </DialogDescription>
       </DialogHeader>
 
-      <SearchBox setValue={setSearchResults} />
+      <SearchBox setValue={setSearchResults} type="users" />
 
       <div className="overflow-y-auto">
         {data.map((user, index) => {

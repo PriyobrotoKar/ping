@@ -9,7 +9,7 @@ import { useEffect } from "react";
 import { socket } from "@/lib/socket";
 
 interface ConversationProps {
-  searchResults: IUser[];
+  searchResults: (IUser | IChat)[];
 }
 
 const Conversations = ({ searchResults }: ConversationProps) => {
@@ -159,52 +159,72 @@ const Conversations = ({ searchResults }: ConversationProps) => {
 };
 
 interface UserSearchResultsProps {
-  users: IUser[];
+  users: any[];
 }
 
 const UserSearchResults = ({ users }: UserSearchResultsProps) => {
+  const chatId = useParams({
+    strict: false,
+  }).chatId;
+
   const { auth } = useAuth();
   return (
     <div>
-      {users.map((user) => (
-        <Link
-          to={`/private/$chatId`}
-          params={{
-            chatId: `${auth?._id}-${user._id.toString()}`,
-          }}
-        >
-          <div
-            key={user._id.toString()}
-            className="p-4 hover:bg-accent cursor-pointer"
+      {users.map((user) => {
+        const name = user.fullName || user.groupName;
+        const isActive =
+          chatId ===
+          (user.isGroupChat
+            ? user._id.toString()
+            : `${auth?._id}-${user._id.toString()}`);
+
+        return (
+          <Link
+            to={user.isGroupChat ? `/public/$chatId` : `/private/$chatId`}
+            params={{
+              chatId: user.isGroupChat
+                ? user._id.toString()
+                : `${auth?._id}-${user._id.toString()}`,
+            }}
           >
-            <div className="flex justify-between items-center">
-              <div className="flex gap-2">
-                <Avatar className="size-10 relative overflow-visible border">
-                  <AvatarImage>
-                    <img src={undefined} alt={user.fullName} />
-                  </AvatarImage>
-                  <AvatarFallback>{user.fullName.charAt(0)}</AvatarFallback>
-                  {user.online && (
-                    <span className="size-3 bg-green-500 absolute bottom-0 rounded-full right-0 border-2 border-background"></span>
-                  )}
-                </Avatar>
-                <div>
-                  <h3 className="font-semibold">{user.fullName}</h3>
-                  <p className="text-sm max-w-40 overflow-ellipsis line-clamp-1 text-muted-foreground">
-                    {user.email}
-                  </p>
+            <div
+              key={user._id.toString()}
+              className={cn(
+                "p-4 relative hover:bg-accent cursor-pointer",
+                isActive && "bg-accent",
+              )}
+            >
+              <div className="flex justify-between items-center">
+                <div className="flex gap-2">
+                  <Avatar className="size-10 relative overflow-visible border">
+                    <AvatarImage>
+                      <img src={undefined} alt={name} />
+                    </AvatarImage>
+                    <AvatarFallback>{name.charAt(0)}</AvatarFallback>
+                    {/* @ts-ignore */}
+                    {user?.online && (
+                      <span className="size-3 bg-green-500 absolute bottom-0 rounded-full right-0 border-2 border-background"></span>
+                    )}
+                  </Avatar>
+                  <div>
+                    <h3 className="font-semibold">{name}</h3>
+                    <p className="text-sm max-w-40 overflow-ellipsis line-clamp-1 text-muted-foreground">
+                      {/* @ts-ignore */}
+                      {user?.email ?? user.lastMessage?.content}
+                    </p>
+                  </div>
                 </div>
+                <span className="text-xs text-gray-400">
+                  {new Date().toLocaleTimeString("en-US", {
+                    hour: "2-digit",
+                    minute: "2-digit",
+                  })}
+                </span>
               </div>
-              <span className="text-xs text-gray-400">
-                {new Date().toLocaleTimeString("en-US", {
-                  hour: "2-digit",
-                  minute: "2-digit",
-                })}
-              </span>
             </div>
-          </div>
-        </Link>
-      ))}
+          </Link>
+        );
+      })}
     </div>
   );
 };
