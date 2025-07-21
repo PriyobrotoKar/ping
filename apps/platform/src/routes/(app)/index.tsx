@@ -16,8 +16,8 @@ function App() {
           type="full"
         />
         <p className="text-sm text-muted-foreground">
-          This is an empty chat screen. This will be shown when no chat is
-          selected.
+          It’s a bit quiet in here. Select a chat from the left or create a new
+          group to break the silence.
         </p>
       </div>
     </div>
