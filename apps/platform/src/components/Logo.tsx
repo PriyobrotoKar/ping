@@ -1,4 +1,5 @@
 import { useTheme } from "@/providers/ThemeProvider";
+import { Link } from "@tanstack/react-router";
 import { useEffect, useState } from "react";
 
 interface LogoProps {
@@ -26,7 +27,11 @@ const Logo = (props: LogoProps) => {
     setResolvedTheme(theme);
   }, [theme]);
 
-  return <img width={100} height={40} {...props} src={source} alt="Logo" />;
+  return (
+    <Link to="/">
+      <img width={100} height={40} {...props} src={source} alt="Logo" />
+    </Link>
+  );
 };
 
 export default Logo;
