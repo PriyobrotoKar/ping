@@ -97,6 +97,7 @@ const ChatScreen = ({ chatId }: ChatScreenProps) => {
     });
 
     setMessage("");
+    setIsTyping(false);
     scrollToBottom();
   };
 
