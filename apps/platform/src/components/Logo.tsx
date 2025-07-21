@@ -28,7 +28,7 @@ const Logo = (props: LogoProps) => {
   }, [theme]);
 
   return (
-    <Link to="/">
+    <Link to="/" className="block">
       <img width={100} height={40} {...props} src={source} alt="Logo" />
     </Link>
   );
